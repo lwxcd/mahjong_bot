@@ -1,0 +1,3 @@
+org.bot.util.point.impl.MleagueRuleCalculateServiceImpl
+org.bot.util.point.impl.BaseRCRCalculateRule
+org.bot.util.point.impl.EmptyCalculateServiceImpl

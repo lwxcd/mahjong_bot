@@ -4,7 +4,7 @@ plugins {
     id("com.bmuschko.docker-spring-boot-application") version "9.4.0"
 }
 
-group = "org.liahnu.bot"
+group = "org.bot"
 version = "1.0-SNAPSHOT"
 
 
