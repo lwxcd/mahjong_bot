@@ -7,13 +7,14 @@
     <resultMap id="BaseResultMap" type="org.bot.model.domain.User">
         <id property="id" column="id" jdbcType="INTEGER"/>
         <result property="nickname" column="nick_name" jdbcType="VARCHAR"/>
+        <result property="groupId" column="group_id" jdbcType="BIGINT"/>
         <result property="extInfo" column="ext_info" jdbcType="VARCHAR"
                 typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <sql id="Base_Column_List">
+    <sql id="Base_Colgroup_id,umn_List">
         id,nick_name,ext_info,update_time,create_time
     </sql>
 </mapper>

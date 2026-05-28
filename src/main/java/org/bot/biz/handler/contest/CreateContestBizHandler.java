@@ -28,7 +28,7 @@ public class CreateContestBizHandler
 
         List<ContestRecord> recordList = new ArrayList<>();
         for (CreateContestBizServiceRequest.PlayerRecord pr : request.getRecords()) {
-            User user = userService.queryOrCreateByNickname(pr.getNickname());
+            User user = userService.queryOrCreateByNickname(pr.getNickname(), request.getGroupId());
 
             ContestRecord record = new ContestRecord();
             record.setContestId(contest.getId());

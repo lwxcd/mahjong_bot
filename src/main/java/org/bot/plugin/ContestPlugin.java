@@ -149,7 +149,7 @@ public class ContestPlugin {
             return;
         }
 
-        List<Elo> ranking = eloService.getRankingByType(type, 20);
+        List<Elo> ranking = eloService.getRankingByType(type, event.getGroupId(), 20);
         if (ranking.isEmpty()) {
             bot.sendGroupMsg(event.getGroupId(), "暂无排名数据", false);
             return;

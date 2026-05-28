@@ -75,7 +75,7 @@ public class ContestEndServiceImpl extends ServiceImpl<ContestEndMapper, Contest
         contest.setStatus(ContestStatus.END);
         contestService.updateById(contest);
 
-        Map<Integer, Pair<BigDecimal, BigDecimal>> calculateElo = calculateElo(contestId, contest.getType());
+        Map<Integer, Pair<BigDecimal, BigDecimal>> calculateElo = calculateElo(contestId, contest.getType(), contest.getCreateGroupId());
         updateChangeElo(calculateElo, contest.getId());
 
         Bot bot = botContainer.getBot();
@@ -119,7 +119,7 @@ public class ContestEndServiceImpl extends ServiceImpl<ContestEndMapper, Contest
         });
     }
 
-    public Map<Integer, Pair<BigDecimal, BigDecimal>> calculateElo(Integer contestId, ContestType contestType) {
+    public Map<Integer, Pair<BigDecimal, BigDecimal>> calculateElo(Integer contestId, ContestType contestType, Long groupId) {
         List<ContestEnd> contestEndList = this.list(new QueryWrapper<ContestEnd>().eq("contest_id", contestId));
 
         EloCalculateContext context = new EloCalculateContext();
@@ -130,13 +130,13 @@ public class ContestEndServiceImpl extends ServiceImpl<ContestEndMapper, Contest
 
         Map<Integer, BigDecimal> originalElo = new HashMap<>();
         for (ContestEnd contestEnd : contestEndList) {
-            BigDecimal elo = eloService.getElo(contestEnd.getUserId(), contestType);
+            BigDecimal elo = eloService.getElo(contestEnd.getUserId(), contestType, groupId);
             originalElo.put(contestEnd.getUserId(), elo);
         }
         context.setOriginalElo(originalElo);
 
         Map<Integer, BigDecimal> eloChange = EloCalculate.calculate(contestType, context);
-        List<Elo> changeElo = eloService.updateElo(eloChange, contestType);
+        List<Elo> changeElo = eloService.updateElo(eloChange, contestType, groupId);
 
         Map<Integer, Pair<BigDecimal, BigDecimal>> ret = new HashMap<>();
         for (Elo elo : changeElo) {

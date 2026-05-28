@@ -5,5 +5,5 @@ import org.bot.model.domain.User;
 
 public interface UserService extends IService<User> {
 
-    User queryOrCreateByNickname(String nickname);
+    User queryOrCreateByNickname(String nickname, Long groupId);
 }

@@ -29,6 +29,12 @@ public class Elo implements Serializable {
     private Integer userId;
 
     /**
+     * 群号
+     */
+    @TableField(value = "group_id")
+    private Long groupId;
+
+    /**
      * 类型
      */
     @TableField(value = "type")

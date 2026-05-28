@@ -15,11 +15,11 @@ import java.util.Map;
 */
 public interface EloService extends IService<Elo> {
 
-    BigDecimal getElo(Integer userId, ContestType type);
+    BigDecimal getElo(Integer userId, ContestType type, Long groupId);
 
-    List<Elo> updateElo(Map<Integer, BigDecimal> map, ContestType type);
+    List<Elo> updateElo(Map<Integer, BigDecimal> map, ContestType type, Long groupId);
 
     List<Elo> queryUserElo(Integer userId);
 
-    List<Elo> getRankingByType(ContestType type, int limit);
+    List<Elo> getRankingByType(ContestType type, Long groupId, int limit);
 }

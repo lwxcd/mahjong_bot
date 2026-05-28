@@ -1,13 +1,15 @@
+-- Active: 1779025145042@@192.168.124.22@3306@bot
 create table user
 (
     id          int auto_increment
         primary key,
     nick_name   varchar(64)  not null comment '昵称',
+    group_id    bigint       not null comment '群号',
     ext_info    json         null comment '扩展信息',
     create_time timestamp    not null default CURRENT_TIMESTAMP,
     update_time timestamp    not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-    constraint user_nick_name_uindex
-        unique (nick_name)
+    constraint user_nick_name_group_id_uindex
+        unique (nick_name, group_id)
 )
     comment '用户';
 
@@ -57,9 +59,10 @@ create table elo
 (
     id          int auto_increment
         primary key,
+    group_id    bigint                         not null comment '群号',
     user_id     int                            not null,
     type        varchar(16)                    null,
-    elo         decimal(10, 2) default 2000.00 not null,
+    elo         decimal(10, 2) default 0.00 not null,
     create_time timestamp                      not null default CURRENT_TIMESTAMP,
     update_time timestamp                      not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
     constraint elo_type_user_id_uindex

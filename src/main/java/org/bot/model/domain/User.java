@@ -22,6 +22,9 @@ public class User implements Serializable {
     @TableField(value = "nick_name")
     private String nickname;
 
+    @TableField(value = "group_id")
+    private Long groupId;
+
     @TableField(value = "ext_info", typeHandler = JacksonTypeHandler.class)
     private Map<String, String> extInfo;
 

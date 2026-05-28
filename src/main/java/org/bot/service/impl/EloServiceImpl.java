@@ -23,31 +23,32 @@ import java.util.Map;
 public class EloServiceImpl extends ServiceImpl<EloMapper, Elo>
     implements EloService{
 
-    private Elo createDefaultElo(Integer userId, ContestType type) {
+    private Elo createDefaultElo(Integer userId, ContestType type, Long groupId) {
         Elo elo = new Elo();
         elo.setUserId(userId);
-        elo.setElo(new BigDecimal(2000));
+        elo.setGroupId(groupId);
+        elo.setElo(BigDecimal.ZERO);
         elo.setType(type.getParent());
         this.save(elo);
         return elo;
     }
 
     @Override
-    public BigDecimal getElo(Integer userId, ContestType type) {
+    public BigDecimal getElo(Integer userId, ContestType type, Long groupId) {
 
-        Elo elo = this.getOne(new QueryWrapper<Elo>().eq("user_id", userId));
+        Elo elo = this.getOne(new QueryWrapper<Elo>().eq("user_id", userId).eq("group_id", groupId));
         if(elo == null){
-            elo = createDefaultElo(userId, type);
+            elo = createDefaultElo(userId, type, groupId);
         }
         return elo.getElo();
     }
 
     @Override
-    public List<Elo> updateElo(Map<Integer, BigDecimal> map, ContestType type) {
+    public List<Elo> updateElo(Map<Integer, BigDecimal> map, ContestType type, Long groupId) {
         List<Elo> ret = new  ArrayList<>();
 
         for (Map.Entry<Integer, BigDecimal> entry : map.entrySet()) {
-            Elo elo = this.getOne(new QueryWrapper<Elo>().eq("user_id", entry.getKey()));
+            Elo elo = this.getOne(new QueryWrapper<Elo>().eq("user_id", entry.getKey()).eq("group_id", groupId));
             elo.setElo(entry.getValue());
             this.updateById(elo);
 
@@ -64,9 +65,10 @@ public class EloServiceImpl extends ServiceImpl<EloMapper, Elo>
     }
 
     @Override
-    public List<Elo> getRankingByType(ContestType type, int limit) {
+    public List<Elo> getRankingByType(ContestType type, Long groupId, int limit) {
         LambdaQueryWrapper<Elo> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Elo::getType, type.getParent());
+        queryWrapper.eq(Elo::getGroupId, groupId);
         queryWrapper.orderByDesc(Elo::getElo);
         queryWrapper.last("limit " + limit);
         return this.list(queryWrapper);
