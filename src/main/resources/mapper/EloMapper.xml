@@ -5,17 +5,16 @@
 <mapper namespace="org.bot.mapper.EloMapper">
 
     <resultMap id="BaseResultMap" type="org.bot.model.domain.Elo">
-            <id property="id" column="id" jdbcType="INTEGER"/>
-            <result property="userId" column="user_id" jdbcType="BIGINT"/>
-            <result property="groupId" column="group_id" jdbcType="BIGINT"/>
-            <result property="type" column="type" jdbcType="VARCHAR"/>
-            <result property="elo" column="elo" jdbcType="DECIMAL"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="groupId" column="group_id" jdbcType="BIGINT"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="elo" column="elo" jdbcType="DECIMAL"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <sql id="Base_Cgroup_id,olumn_List">
-        id,user_id,type,
-        elo,update_time,create_time
+    <sql id="Base_Column_List">
+        id,user_id,group_id,type,elo,update_time,create_time
     </sql>
 </mapper>

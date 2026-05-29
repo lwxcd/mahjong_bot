@@ -19,22 +19,28 @@ import java.io.IOException;
 public class HelpPlugin {
 
     @AnyMessageHandler
-    @MessageHandlerFilter(cmd = "help",at = AtEnum.NEED)
+    @MessageHandlerFilter(cmd = "help", at = AtEnum.NEED)
     public void help(Bot bot, AnyMessageEvent event) throws IOException {
         ClassPathResource resource = new ClassPathResource("static/help.jpg");
         byte[] img = resource.getContentAsByteArray();
         MsgUtils msg = MsgUtils.builder()
                 .reply(event.getMessageId())
                 .img(img)
-                .text("欢迎使用Mahjong Bot，请输入以下命令：\n")
-                .text("- help：显示帮助信息\n")
-                .text("群聊功能: \n")
-                .text("- 添加记录 <contestId> <direction> <score>：记录比赛成绩\n")
-                .text("- 查询比赛：获取比赛列表\n")
-                .text("- 创建比赛 [参数]：创建一个新的比赛\n")
-                .text("- [参数]: RCR 立直麻将比赛（默认雀魂规）/MCR 国标麻将/M M规 \n")
-                .text("私聊功能: \n")
-                .text("- 查询记录：查看历史比赛记录\n");
+                .text("欢迎使用 Mahjong Bot\n")
+                .text("群聊命令：\n")
+                .text("- 创建比赛 [规则]：创建比赛并提交分数（多行格式，详见下方示例）\n")
+                .text("- 查询比赛 [比赛ID]：查看群内最近的比赛，或指定ID查看详情\n")
+                .text("- 查看排名 [规则]：查看 Elo 排名（默认 M 规）\n")
+                .text("私聊命令：\n")
+                .text("- 更新比赛 <比赛ID>：手动触发结算\n")
+                .text("规则类型：RCR | MCR | A | M（默认 M）\n")
+                .text("\n示例：\n")
+                .text("创建比赛 M\n")
+                .text("南4 2本场\n")
+                .text("bbb 46400\n")
+                .text("ccc 4800\n")
+                .text("aaa 20400\n")
+                .text("ddd 27400\n");
 
         bot.sendMsg(event, msg.build(), false);
     }

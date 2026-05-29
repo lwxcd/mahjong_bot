@@ -15,10 +15,14 @@ import org.bot.biz.base.ServiceCallback;
 import org.bot.biz.request.contest.CreateContestBizServiceRequest;
 import org.bot.biz.result.contest.CreateContestBizServiceResult;
 import org.bot.model.domain.Contest;
+import org.bot.model.domain.ContestEnd;
+import org.bot.model.domain.ContestRecord;
 import org.bot.model.domain.Elo;
 import org.bot.model.domain.User;
 import org.bot.model.type.ContestType;
 import org.bot.model.type.DirectionType;
+import org.bot.service.ContestEndService;
+import org.bot.service.ContestRecordService;
 import org.bot.service.ContestService;
 import org.bot.service.EloService;
 import org.bot.service.UserService;
@@ -36,6 +40,12 @@ public class ContestPlugin {
 
     @Autowired
     private ContestService contestService;
+
+    @Autowired
+    private ContestEndService contestEndService;
+
+    @Autowired
+    private ContestRecordService contestRecordService;
 
     @Autowired
     private EloService eloService;
@@ -117,24 +127,67 @@ public class ContestPlugin {
     }
 
     @GroupMessageHandler
-    @MessageHandlerFilter(at = AtEnum.NEED, cmd = "查询比赛")
-    public void getContest(Bot bot, GroupMessageEvent event) {
-        Integer page = 1;
-        Integer size = 10;
-        List<Contest> contests = contestService.queryLastContest4Group(event.getGroupId(), page, size);
-        if (contests.isEmpty()) {
-            bot.sendGroupMsg(event.getGroupId(), "没有找到任何比赛", false);
-            return;
-        }
+    @MessageHandlerFilter(at = AtEnum.NEED, cmd = "查询比赛\\s*(\\d*)")
+    public void getContest(Bot bot, GroupMessageEvent event, Matcher matcher) {
+        String contestIdStr = matcher.group(1);
 
-        MsgUtils builder = MsgUtils.builder();
-        builder.reply(event.getMessageId());
-        for (Contest contest : contests) {
-            builder.text("比赛ID: " + contest.getId()
-                    + " | 类型: " + contest.getType().getDescription()
-                    + " | 状态: " + contest.getStatus() + "\n");
+        if (contestIdStr != null && !contestIdStr.isEmpty()) {
+            Integer contestId = Integer.valueOf(contestIdStr);
+            Contest contest = contestService.getById(contestId);
+            if (contest == null) {
+                bot.sendGroupMsg(event.getGroupId(), "比赛不存在", false);
+                return;
+            }
+
+            List<ContestEnd> endList = contestEndService.list(
+                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<ContestEnd>().eq("contest_id", contestId));
+            if (endList.isEmpty()) {
+                bot.sendGroupMsg(event.getGroupId(), "该比赛尚未结算", false);
+                return;
+            }
+
+            List<ContestRecord> records = contestRecordService.list(
+                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<ContestRecord>().eq("contest_id", contestId));
+
+            MsgUtils builder = MsgUtils.builder();
+            builder.reply(event.getMessageId());
+            builder.text("比赛ID: " + contestId + " | 类型: " + contest.getType().getDescription() + "\n");
+
+            for (ContestEnd end : endList) {
+                User user = userService.getById(end.getUserId());
+                String name = (user != null) ? user.getNickname() : "未知";
+                ContestRecord record = records.stream()
+                        .filter(r -> r.getRecordUserId().equals(end.getUserId()))
+                        .findFirst().orElse(null);
+
+                String directionStr = (record != null) ? record.getDirection().getName() : "?";
+                Integer point = (record != null) ? record.getPoint() : 0;
+
+                String sign = end.getEloChange().compareTo(java.math.BigDecimal.ZERO) >= 0 ? "+" : "";
+                builder.text("👤 " + name + " (" + directionStr + ") "
+                        + (point >= 0 ? "+" : "") + point
+                        + " → 精算 " + end.getEndPoint()
+                        + " | ELO " + sign + end.getEloChange() + "\n");
+            }
+            bot.sendGroupMsg(event.getGroupId(), builder.build(), false);
+        } else {
+            Integer page = 1;
+            Integer size = 10;
+            List<Contest> contests = contestService.queryLastContest4Group(event.getGroupId(), page, size);
+            if (contests.isEmpty()) {
+                bot.sendGroupMsg(event.getGroupId(), "没有找到任何比赛", false);
+                return;
+            }
+
+            MsgUtils builder = MsgUtils.builder();
+            builder.reply(event.getMessageId());
+            for (Contest contest : contests) {
+                builder.text("比赛ID: " + contest.getId()
+                        + " | 类型: " + contest.getType().getDescription()
+                        + " | 状态: " + contest.getStatus() + "\n");
+            }
+            bot.sendGroupMsg(event.getGroupId(), builder.build(), false);
         }
-        bot.sendGroupMsg(event.getGroupId(), builder.build(), false);
     }
 
     @GroupMessageHandler

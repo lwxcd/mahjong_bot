@@ -14,7 +14,7 @@
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <sql id="Base_Colgroup_id,umn_List">
-        id,nick_name,ext_info,update_time,create_time
+    <sql id="Base_Column_List">
+        id,nick_name,group_id,ext_info,update_time,create_time
     </sql>
 </mapper>
