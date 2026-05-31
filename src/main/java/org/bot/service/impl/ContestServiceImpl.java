@@ -33,7 +33,6 @@ public class ContestServiceImpl extends ServiceImpl<ContestMapper, Contest>
         Page<Contest> contestPage = new Page<>(page, size);
         LambdaQueryWrapper<Contest> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Contest::getCreateGroupId, groupId);
-        queryWrapper.ne(Contest::getStatus, ContestStatus.END);
         queryWrapper.orderByDesc(Contest::getCreateTime);
         return this.page(contestPage, queryWrapper).getRecords();
     }

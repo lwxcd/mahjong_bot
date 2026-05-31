@@ -31,8 +31,6 @@ public class HelpPlugin {
                 .text("- 创建比赛 [规则]：创建比赛并提交分数（多行格式，详见下方示例）\n")
                 .text("- 查询比赛 [比赛ID]：查看群内最近的比赛，或指定ID查看详情\n")
                 .text("- 查看排名 [规则]：查看 Elo 排名（默认 M 规）\n")
-                .text("私聊命令：\n")
-                .text("- 更新比赛 <比赛ID>：手动触发结算\n")
                 .text("规则类型：RCR | MCR | A | M（默认 M）\n")
                 .text("\n示例：\n")
                 .text("创建比赛 M\n")

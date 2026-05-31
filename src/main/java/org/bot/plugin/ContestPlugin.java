@@ -69,7 +69,7 @@ public class ContestPlugin {
         }
 
         if (lines.size() < 5) {
-            throw new BizServiceException(null, "格式错误：需要1行场况 + 4行玩家记录");
+            throw new BizServiceException(null, "格式错误：消息至少需要5行（1行场况 + 4行玩家记录），当前仅 " + lines.size() + " 行");
         }
 
         List<CreateContestBizServiceRequest.PlayerRecord> records = new ArrayList<>();
@@ -77,14 +77,25 @@ public class ContestPlugin {
             String line = lines.get(i);
             int lastSpace = line.lastIndexOf(' ');
             if (lastSpace <= 0) {
-                throw new BizServiceException(null, "格式错误：第" + (i + 1) + "行应为 '昵称 分数'");
+                throw new BizServiceException(null, "格式错误：第" + (i + 1) + "行应使用 '昵称 分数' 格式，当前为 '" + line + "'");
             }
             String nickname = line.substring(0, lastSpace).trim();
             String scoreStr = line.substring(lastSpace + 1).trim();
 
+            if (nickname.isEmpty()) {
+                throw new BizServiceException(null, "格式错误：第" + (i + 1) + "行昵称不能为空");
+            }
+
+            int score;
+            try {
+                score = Integer.parseInt(scoreStr);
+            } catch (NumberFormatException e) {
+                throw new BizServiceException(null, "格式错误：第" + (i + 1) + "行分数 '" + scoreStr + "' 不是有效整数");
+            }
+
             CreateContestBizServiceRequest.PlayerRecord pr = new CreateContestBizServiceRequest.PlayerRecord();
             pr.setNickname(nickname);
-            pr.setScore(Integer.valueOf(scoreStr));
+            pr.setScore(score);
             pr.setDirection(DIRECTIONS[i - 1]);
             records.add(pr);
         }
@@ -99,7 +110,12 @@ public class ContestPlugin {
                     @Override
                     public CreateContestBizServiceRequest buildRequest() {
                         String stringType = matcher.group(1);
-                        ContestType type = (stringType == null || stringType.isEmpty()) ? ContestType.M : ContestType.valueOf(stringType);
+                        ContestType type;
+                        try {
+                            type = (stringType == null || stringType.isEmpty()) ? ContestType.M : ContestType.valueOf(stringType);
+                        } catch (IllegalArgumentException e) {
+                            throw new BizServiceException(null, "不支持的比赛类型 '" + stringType + "'，可选：RCR、M、MCR、A");
+                        }
                         String body = matcher.group(2);
 
                         CreateContestBizServiceRequest request = new CreateContestBizServiceRequest();
